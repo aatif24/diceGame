@@ -1,0 +1,15 @@
+{
+    "game": [
+        {
+            "id": 1,
+            "status": "open",
+            "winner": ""
+        }
+    ],
+    "participants": [
+        {
+            "gameId": 1,
+            "clientId": "123"
+        }
+    ]
+}
