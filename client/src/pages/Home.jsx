@@ -74,7 +74,7 @@ const App = () => {
     };
 
     return (
-        <div className="container-fluid p-5">
+        <div className="container p-5">
             {!showRegistration ? (
                 <>
                     <div className=" d-flex border-bottom py-5 justify-content-between align-items-center">

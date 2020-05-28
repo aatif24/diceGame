@@ -2,7 +2,7 @@ module.exports = {
     newGame: (socket, data) => {
         socket.emit("newGame", data);
     },
-    joinedGame: (socket, data) => {
-        socket.emit("joinedGame", data);
+    newParticipant: (socket, data) => {
+        socket.emit("newParticipant", data);
     },
 };
