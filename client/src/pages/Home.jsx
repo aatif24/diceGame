@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Redirect } from "react-router-dom";
 import socketIOClient from "socket.io-client";
 import { API_ENDPOINT, API_ENDPOINT_CLIENT, API_ENDPOINT_GAME } from "../config/constant";
 import RegisterClient from "../component/RegisterClient";
@@ -7,6 +7,8 @@ import RegisterClient from "../component/RegisterClient";
 const socket = socketIOClient(API_ENDPOINT);
 const App = () => {
     const [games, setGames] = useState([]);
+    const [redirect, setRedirect] = useState("");
+    const [msg, setMsg] = useState("");
     const [client, setClient] = useState(false);
     const [showRegistration, setShowRegistration] = useState(false);
 
@@ -24,6 +26,7 @@ const App = () => {
                 console.log("something is wrong", err);
             });
     };
+
     let getClientData = async (id) => {
         fetch(API_ENDPOINT_CLIENT + "/getClientById?clientId=" + id, {
             method: "GET",
@@ -60,6 +63,7 @@ const App = () => {
             setShowRegistration(false);
         }
     };
+
     let createNewGame = () => {
         let { id } = client;
 
@@ -68,6 +72,13 @@ const App = () => {
             body: JSON.stringify({ clientId: id }),
         })
             .then((response) => response.json())
+            .then((data) => {
+                if (data.status && data["data"] && data["data"]["gameId"]) {
+                    setRedirect("/" + data["data"]["gameId"]);
+                } else {
+                    setMsg(data.msg);
+                }
+            })
             .catch((err) => {
                 console.log("something is wrong", err);
             });
@@ -75,6 +86,7 @@ const App = () => {
 
     return (
         <div className="container p-5">
+            {redirect ? <Redirect to={redirect} /> : null}
             {!showRegistration ? (
                 <>
                     <div className=" d-flex border-bottom py-5 justify-content-between align-items-center">
@@ -89,7 +101,8 @@ const App = () => {
                             </button>
                         </div>
                     </div>
-                    <h1 className="mt-3">Games Listing</h1>
+                    <h3 className="mt-3">Games Listing</h3>
+                    <h3 className="my-1">{msg}</h3>
                     {games && games.length
                         ? games.map((v, i) => {
                               return (

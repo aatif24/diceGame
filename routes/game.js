@@ -39,7 +39,7 @@ router.post("/createGame", async (req, res) => {
             created_by: clientId,
         };
 
-        let { insertId } = await createNewGame(con, data);
+        var { insertId } = await createNewGame(con, data);
 
         if (insertId) {
             let data = {
@@ -59,7 +59,7 @@ router.post("/createGame", async (req, res) => {
         return;
     }
 
-    res.json({ status: 1, msg: "Create", data: {} }).status(200);
+    res.json({ status: 1, msg: "Create", data: { gameId: insertId } }).status(200);
     return;
 });
 
