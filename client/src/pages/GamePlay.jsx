@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import socketIOClient from "socket.io-client";
-import { API_ENDPOINT, API_ENDPOINT_CLIENT, API_ENDPOINT_GAME, TIMEOUT } from "../config/constant";
+import {
+    API_ENDPOINT,
+    API_ENDPOINT_CLIENT,
+    API_ENDPOINT_GAME,
+    TIMEOUT,
+    WINNING_LIMIT,
+} from "../config/constant";
 const socket = socketIOClient(API_ENDPOINT);
 var timer;
 const App = () => {
@@ -45,12 +51,12 @@ const App = () => {
                             if (c.client_id == clientId) {
                                 setScore(c.score);
                             }
-                            if (c.score >= 61 && c.client_id != clientId) {
+                            if (c.score >= WINNING_LIMIT && c.client_id != clientId) {
                                 setMsg(c.name + " won the game");
                                 setTurn("disabled");
-                            } else if (c.score >= 61 && c.client_id == clientId) {
+                            } else if (c.score >= WINNING_LIMIT && c.client_id == clientId) {
                                 setMsg("You won the game");
-                            } else if (c.score < 61 && c.client_id == clientId) {
+                            } else if (c.score < WINNING_LIMIT && c.client_id == clientId) {
                                 if (c.client_id == clientId && c.turn == "1") {
                                     setTurn("");
                                 }
@@ -78,7 +84,7 @@ const App = () => {
                 if (data && data.status) {
                     setScore(data.data.score);
                     setTurn("disabled");
-                    if (data.data.score >= 61) {
+                    if (data.data.score >= WINNING_LIMIT) {
                         setMsg("You won this Game");
                     } else {
                         setMsg("");

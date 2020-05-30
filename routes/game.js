@@ -13,6 +13,7 @@ const {
     updateClientScore,
     getNextPlayer,
 } = require("../model/game");
+const { PLAYER_LIMIT, WINNING_LIMIT } = require("../config/constants");
 
 const { newGame, newParticipant, startGame, setNextPlayer, refreshScore } = require("../io/game");
 
@@ -64,7 +65,6 @@ router.post("/createGame", async (req, res) => {
 
 router.post("/joinGame", async (req, res) => {
     let con = req.app.get("con");
-    let { PLAYER_LIMIT } = req.app.get("constants");
 
     let io = req.app.get("io");
     let { clientId, id } = req.body;
@@ -174,6 +174,27 @@ router.post("/startGame", async (req, res) => {
     let con = req.app.get("con");
     let io = req.app.get("io");
     let { clientId, id } = req.body;
+
+    try {
+        let allParticipants = await getGameParticipants(con, id);
+        if (allParticipants && allParticipants.length <= 1) {
+            res.json({
+                status: 0,
+                msg: "Game can not be started with single player",
+                data: {},
+            }).status(200);
+            return;
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: 0,
+            msg: "error while fetching game participants",
+            data: {},
+            err: error,
+        });
+        return;
+    }
     try {
         let data = {
             status: "running",
@@ -233,7 +254,7 @@ let rollADice = async (con, clientId, id, io) => {
                 status: 200,
             };
         }
-        
+
         participantsCount = gameDetail[0]["participantCount"];
 
         if (gameDetail.length && gameDetail[0]["status"] != "running") {
@@ -285,7 +306,7 @@ let rollADice = async (con, clientId, id, io) => {
         };
     }
 
-    // if the score is >=61  update game and declare winner
+    // if the score is >=WINNING_LIMIT  update game and declare winner
 
     let latestScore = score[0]["score"] + randomNum;
 
@@ -318,7 +339,7 @@ let rollADice = async (con, clientId, id, io) => {
         };
     }
 
-    if (latestScore >= 61) {
+    if (latestScore >= WINNING_LIMIT) {
         // update game as closed and declare a winner
         let data = {
             status: "closed",
@@ -353,9 +374,7 @@ let rollADice = async (con, clientId, id, io) => {
                 status: 500,
             };
         }
-
     } else {
-
         con.commit();
         //get next player
         try {
@@ -375,12 +394,11 @@ let rollADice = async (con, clientId, id, io) => {
                 gameId: id,
                 clientId: nextPlayer[0]["client_id"],
             };
-            
+
             nextPlayerId = nextPlayer[0]["client_id"];
-            
+
             setNextPlayer(io, nxData);
             refreshScore(io, id);
-            
         } catch (error) {
             console.log(error);
             con.rollback();
