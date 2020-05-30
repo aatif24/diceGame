@@ -6,13 +6,10 @@ NodeJs ^13.7.0<br/>
 npm ^6.13.6
 
 -   P.S : you will need at least two browser windows to play a game
-
-* Need two terminals to run this project
-
--   one is where you will be running server
--   second is where you will be running client
-
-* Import mysql db file found in root directory with name `/dbStructure.sql`
+-   Need two terminals to run this project
+    a.   one is where you will be running server
+    b.   second is where you will be running client
+-   Import mysql db file found in root directory with name `/dbStructure.sql`
 
 ### run `npm install` into root folder as well as in ./client folder to add all required packages to the project
 
