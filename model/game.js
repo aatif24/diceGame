@@ -117,19 +117,6 @@ module.exports = {
             );
         });
     },
-    getClientByTurn: (con, id) => {
-        return new Promise((resolve, reject) => {
-            con.query(
-                `SELECT 
-                    client_id
-                FROM
-                    gameParticipants 
-                WHERE
-                    game_id = ${id} AND turn = 1`,
-                (err, data) => (err ? reject(err) : resolve(data))
-            );
-        });
-    },
     getNextPlayer: (con, id, order, count) => {
         return new Promise((resolve, reject) => {
             nextOrder = order == count ? 1 : order + 1;

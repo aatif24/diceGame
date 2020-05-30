@@ -18,6 +18,7 @@ app.use(bodyParser.json({ type: "*/*" }));
 app.set("io", io);
 app.set("con", con);
 app.set("constants", constants);
+
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -25,6 +26,7 @@ app.use(function (req, res, next) {
 });
 
 require("./routes/index")(app);
+
 io.on("connection", (socket) => {
     console.log("New client connected", socket.id);
 

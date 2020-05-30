@@ -19,6 +19,7 @@ router.get("/getClientById", async (req, res) => {
     res.status(200).json({ status: 1, msg: "List", data: client[0] });
     return;
 });
+
 router.post("/register", async (req, res) => {
     let con = req.app.get("con");
 

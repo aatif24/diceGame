@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Redirect } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import socketIOClient from "socket.io-client";
-import { API_ENDPOINT, API_ENDPOINT_CLIENT, API_ENDPOINT_GAME } from "../config/constant";
+import { API_ENDPOINT, API_ENDPOINT_CLIENT, API_ENDPOINT_GAME, TIMEOUT } from "../config/constant";
 const socket = socketIOClient(API_ENDPOINT);
 var timer;
 const App = () => {
@@ -66,7 +66,7 @@ const App = () => {
                 console.log("something is wrong", err);
             });
     };
-    // let timer = setInterval(() => rollADice(), 5000);
+
     let rollADice = () => {
         clearTimeout(timer);
 
@@ -83,7 +83,6 @@ const App = () => {
                     } else {
                         setMsg("");
                     }
-                    // clearInterval(timer);
                 } else {
                     setMsg(data.msg);
                     setTimeout(() => {
@@ -115,7 +114,7 @@ const App = () => {
         if (turn == "") {
             timer = setTimeout(() => {
                 rollADice();
-            }, 5000);
+            }, TIMEOUT);
         }
     }, [turn]);
 

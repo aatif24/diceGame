@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+//destructuring of an object to fetch required methods only
 const {
     getAllGames,
     getGameParticipants,
@@ -12,7 +12,6 @@ const {
     getGameById,
     updateClientScore,
     getNextPlayer,
-    getClientByTurn,
 } = require("../model/game");
 
 const { newGame, newParticipant, startGame, setNextPlayer, refreshScore } = require("../io/game");
@@ -40,6 +39,7 @@ router.post("/createGame", async (req, res) => {
         };
 
         let { insertId } = await createNewGame(con, data);
+
         if (insertId) {
             let data = {
                 client_id: clientId,
@@ -51,6 +51,7 @@ router.post("/createGame", async (req, res) => {
             await joinParticipant(con, data);
         }
         let allGames = await getAllGames(con);
+        // socket function to refresh everyone's game listing screen
         newGame(io, allGames);
     } catch (error) {
         res.status(500).json({ status: 0, msg: "error while creating game", data: {}, err: error });
@@ -71,7 +72,9 @@ router.post("/joinGame", async (req, res) => {
     let participants;
 
     try {
+        //check if client is already joined a game
         let checkAlreadyParticipated = await checkParticipant(con, clientId, id);
+
         if (checkAlreadyParticipated.length) {
             let allParticipants = await getGameParticipants(con, id);
             let participantAction = {
@@ -91,6 +94,8 @@ router.post("/joinGame", async (req, res) => {
         });
         return;
     }
+
+    // if participants are greater or equal to set limit return with false status
     try {
         participants = await getGameParticipants(con, id);
         if (participants.length > PLAYER_LIMIT - 1) {
@@ -107,6 +112,7 @@ router.post("/joinGame", async (req, res) => {
         return;
     }
 
+    // set incremental order in which players wll play their turn and join the game
     try {
         let orderId = participants.length
             ? participants[participants.length - 1]["order_by"] + 1
@@ -137,6 +143,7 @@ router.post("/joinGame", async (req, res) => {
         return;
     }
 });
+
 router.get("/participants", async (req, res) => {
     let con = req.app.get("con");
 
@@ -150,7 +157,7 @@ router.get("/participants", async (req, res) => {
             participants: allParticipants,
         };
         newParticipant(io, participantAction);
-        res.json({ status: 1, msg: "already Joined", data: allParticipants }).status(200);
+        res.json({ status: 1, msg: "participants", data: allParticipants }).status(200);
         return;
     } catch (error) {
         res.status(500).json({
@@ -226,7 +233,9 @@ let rollADice = async (con, clientId, id, io) => {
                 status: 200,
             };
         }
+        
         participantsCount = gameDetail[0]["participantCount"];
+
         if (gameDetail.length && gameDetail[0]["status"] != "running") {
             return {
                 response: {
@@ -249,7 +258,9 @@ let rollADice = async (con, clientId, id, io) => {
             status: 500,
         };
     }
+
     let score;
+
     try {
         score = await getScoreByClient(con, clientId, id);
         if (!score.length) {
@@ -279,6 +290,7 @@ let rollADice = async (con, clientId, id, io) => {
     let latestScore = score[0]["score"] + randomNum;
 
     //update score and return number and total score
+
     try {
         let { affectedRows } = await updateClientScore(con, clientId, id, randomNum);
 
@@ -341,7 +353,9 @@ let rollADice = async (con, clientId, id, io) => {
                 status: 500,
             };
         }
+
     } else {
+
         con.commit();
         //get next player
         try {
@@ -361,9 +375,12 @@ let rollADice = async (con, clientId, id, io) => {
                 gameId: id,
                 clientId: nextPlayer[0]["client_id"],
             };
+            
             nextPlayerId = nextPlayer[0]["client_id"];
+            
             setNextPlayer(io, nxData);
             refreshScore(io, id);
+            
         } catch (error) {
             console.log(error);
             con.rollback();
