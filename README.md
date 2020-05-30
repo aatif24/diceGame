@@ -11,6 +11,7 @@ Need two terminals to run this project
 
 -   one is where you will be running server
 -   second is where you will be running client
+-   Import mysql db file found in root directory with name `/dbStructure.sql`
 
 ### run `npm install` into root folder as well as in ./client folder to add all required packages to the project
 
